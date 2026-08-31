@@ -166,6 +166,8 @@ public slots:
 
     void invertSelection();
     void deleteSelectedPrimitives();
+    void deleteSphere();
+    void deleteN_Neighbor();
 
     void setPerspective(bool);
     void copyCamera();

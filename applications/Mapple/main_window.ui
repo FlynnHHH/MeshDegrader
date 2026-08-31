@@ -113,6 +113,8 @@
     <addaction name="actionInvertSelection"/>
     <addaction name="separator"/>
     <addaction name="actionDeleteSelectedPrimitives"/>
+	<addaction name="actionDeleteSphere"/>
+	<addaction name="actionDeleteN_Neighbor"/>
    </widget>
    <widget class="QMenu" name="menuProperty">
     <property name="title">
@@ -810,6 +812,22 @@
     <string>Delete Selected Primitives</string>
    </property>
   </action>
+  <action name="actionDeleteSphere">
+   <property name="text">
+    <string>Delete within Sphere</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete the faces and vertices within the sphere of the selected vertex</string>
+   </property>
+  </action>
+	 <action name="actionDeleteN_Neighbor">
+		 <property name="text">
+			 <string>Delete the N-neighbor of the vertex</string>
+		 </property>
+		 <property name="toolTip">
+			 <string>Delete the N-neighboring faces and vertices of the selected vertex</string>
+		 </property>
+	 </action>
   <action name="actionSelectRect">
    <property name="checkable">
     <bool>true</bool>

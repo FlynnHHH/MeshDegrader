@@ -1059,6 +1059,8 @@ void MainWindow::createActionsForSelectMenu() {
 
     connect(ui->actionInvertSelection, SIGNAL(triggered()), viewer_, SLOT(invertSelection()));
     connect(ui->actionDeleteSelectedPrimitives, SIGNAL(triggered()), viewer_, SLOT(deleteSelectedPrimitives()));
+	connect(ui->actionDeleteSphere, SIGNAL(triggered()), viewer_, SLOT(deleteSphere()));
+	connect(ui->actionDeleteN_Neighbor, SIGNAL(triggered()), viewer_, SLOT(deleteN_Neighbor()));
 
     //////////////////////////////////////////////////////////////////////////
 

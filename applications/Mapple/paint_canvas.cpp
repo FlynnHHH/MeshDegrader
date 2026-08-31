@@ -35,6 +35,7 @@
 #include <QClipboard>
 #include <QStatusBar>
 #include <QOpenGLFramebufferObject>
+#include <QInputDialog>
 
 #include <easy3d/core/surface_mesh.h>
 #include <easy3d/core/point_cloud.h>
@@ -72,6 +73,7 @@
 #include <easy3d/util/line_stream.h>
 #include <easy3d/util/dialog.h>
 #include <easy3d/util/setting.h>
+#include <easy3d/algo/surface_mesh_hole_filling.h>
 
 #include "main_window.h"
 #include "walk_through.h"
@@ -1586,6 +1588,135 @@ void PaintCanvas::deleteSelectedPrimitives() {
     update();
 }
 
+void PaintCanvas::deleteSphere() {
+    if (dynamic_cast<SurfaceMesh*>(currentModel())) {
+        auto mesh = dynamic_cast<SurfaceMesh*>(currentModel());
+		SurfaceMeshPicker picker(camera());
+        auto select_faces = mesh->face_property<bool>("f:select");
+        SurfaceMesh::Face face;
+        for (auto f : mesh->faces()) {
+            if (select_faces[f]) {
+                face = f;
+                break;
+            }
+        }
+        std::cout << "face id:" << face.idx() << std::endl;
+		vec3 barycenter(0, 0, 0);
+		int valence = 0;
+        for (auto v : mesh->vertices(face)) {
+            barycenter += mesh->position(v);
+            ++valence;
+        }
+        if (valence > 0)
+			barycenter /= static_cast<float>(valence);
+        else {
+            LOG(WARNING) << "no vertex found for the selected face";
+            return;
+		}
+        std::size_t count(0);
+        // double radius = 0.1;
+        bool ok = false;
+        double radius = QInputDialog::getDouble(
+            nullptr,
+            "input radius",
+            "input radius:",
+            0.1, 0.0, 10000.0, 3, &ok
+        );
+        if (!ok)
+            return;
+        for (auto f : mesh->faces()) {
+            for (auto v : mesh->vertices(f)) {
+                double s = distance2(mesh->position(v), barycenter);
+                if (s <= radius * radius)
+                {
+                    mesh->delete_face(f);
+                    ++count;
+                    break;
+                }
+            }
+        }
+		mesh->delete_face(face);
+        ++count;
+		SurfaceMeshHoleFilling filler(mesh);
+        mesh->collect_garbage();
+        mesh->manipulator()->reset();
+        mesh->renderer()->update();
+        LOG(INFO) << count << " faces deleted";
+    }
+    else if (dynamic_cast<PointCloud*>(currentModel())) {
+        auto cloud = dynamic_cast<PointCloud*>(currentModel());
+        auto select_vertices = cloud->vertex_property<bool>("v:select");
+        std::size_t count(0);
+        for (auto v : cloud->vertices()) {
+            if (select_vertices[v]) {
+                cloud->delete_vertex(v);
+                ++count;
+            }
+        }
+        cloud->collect_garbage();
+        cloud->manipulator()->reset();
+        cloud->renderer()->update();
+        LOG(INFO) << count << " points deleted";
+    }
+    window_->updateUi();
+    update();
+}
+
+
+void PaintCanvas::deleteN_Neighbor() {
+    if (dynamic_cast<SurfaceMesh*>(currentModel())) {
+        auto mesh = dynamic_cast<SurfaceMesh*>(currentModel());
+        SurfaceMeshPicker picker(camera());
+        auto select_faces = mesh->face_property<bool>("f:select");
+        SurfaceMesh::Face face;
+        for (auto f : mesh->faces()) {
+            if (select_faces[f]) {
+                face = f;
+                break;
+            }
+        }
+        std::cout << "face id:" << face.idx() << std::endl;
+        bool ok = false;
+        int n = QInputDialog::getInt(
+            nullptr,
+            "input maximum depth",
+            "input maximum depth:",
+            1, 0, 10000, 1, &ok
+        );
+        if (!ok)
+            return;
+        std::set<SurfaceMesh::Face> visited;
+        std::queue<std::pair<SurfaceMesh::Face, int>> q;
+        visited.insert(face);
+        q.push({ face, 0 });
+        while (!q.empty()) {
+            auto front = q.front();
+            SurfaceMesh::Face cur_face = front.first;
+            int depth = front.second;
+            q.pop();
+            if (depth >= n) continue;
+            for (auto v : mesh->vertices(cur_face)) {
+                for (auto neighbor : mesh->faces(v)) {
+                    if (neighbor != cur_face && visited.find(neighbor) == visited.end()) {
+                        visited.insert(neighbor);
+                        q.push({ neighbor, depth + 1 });
+                    }
+                }
+            }
+        }
+        size_t count(0);
+        for (auto f : visited) {
+            mesh->delete_face(f);
+            ++count;
+		}
+        mesh->collect_garbage();
+        mesh->manipulator()->reset();
+        mesh->renderer()->update();
+        LOG(INFO) << count << " faces deleted";
+    }
+    window_->updateUi();
+    update();
+}
 
 void PaintCanvas::setPerspective(bool b) {
     if (b)

@@ -138,9 +138,9 @@ for h in mesh.halfedges():
 
 
 
-# # Uncomment the following line to visualize the model (overlaid with edges and vertices)
-# viewer = easy3d.Viewer("Easy3D Viewer")
-# viewer.add_model(mesh)
-# mesh.renderer().get_lines_drawable("edges").set_visible(True)       # Ensure the wireframe is visible.
-# mesh.renderer().get_points_drawable("vertices").set_visible(True)   # Ensure the vertices is visible.
-# viewer.run()
+# Uncomment the following line to visualize the model (overlaid with edges and vertices)
+viewer = easy3d.Viewer("Easy3D Viewer")
+viewer.add_model(mesh)
+mesh.renderer().get_lines_drawable("edges").set_visible(True)       # Ensure the wireframe is visible.
+mesh.renderer().get_points_drawable("vertices").set_visible(True)   # Ensure the vertices is visible.
+viewer.run()
