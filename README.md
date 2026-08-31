@@ -1,12 +1,14 @@
-# Easy3D
+# MeshDegrader
 
-Easy3D 是一个面向 3D 建模、几何处理和实时渲染的 C++ 库，并提供 Python 绑定。本仓库在 Easy3D 原有能力的基础上，重点扩展了 Mapple 中的交互式网格局部删除功能，适合用于 3D 模型查看、编辑、算法实验和教学。
+MeshDegrader 是一个基于 Easy3D 开发的交互式网格退化工具，面向网格结构破坏、网格补全算法评估和相关研究。它继承了 Easy3D 的 3D 模型加载、可视化和几何处理能力，并重点提供可控的网格局部删除功能。
+
+> A tool derived from Easy3D for deliberately degrading mesh structures, enabling further evaluation and investigation of existing mesh completion algorithms.
 
 ## 本版本新增功能
 
-### Mapple 交互式局部删除
+### 交互式网格局部退化
 
-在 Mapple 中打开曲面网格后，可以通过 `Select` 菜单执行以下操作：
+在 MeshDegrader 中打开曲面网格后，可以通过 `Select` 菜单执行以下操作：
 
 - `Delete selected primitives`：删除当前选中的网格面；对点云则删除选中的点。
 - `Delete within Sphere`：以当前选中网格面的重心为中心，输入半径，删除半径范围内包含相关顶点的网格面。
@@ -102,9 +104,9 @@ cmake --build Release --config Release --target Mapple
 
 Qt 未安装或未被 CMake 找到时，Mapple 不会参与构建。此时可通过 `Qt5_DIR` 或 `Qt6_DIR` 指定 Qt 的 CMake 配置目录。
 
-## 使用 Mapple
+## 使用 MeshDegrader
 
-构建完成后运行生成的 `Mapple` 可执行文件。打开模型后，推荐使用以下方式测试新增功能：
+构建完成后运行生成的 `Mapple` 可执行文件。当前应用程序目标仍命名为 `Mapple`，但其网格退化功能以 MeshDegrader 项目定位进行维护。打开模型后，推荐使用以下方式测试新增功能：
 
 1. 加载 `resources/data/bunny.obj`。
 2. 选择 `Select > Select Click`。
